@@ -7,8 +7,24 @@ output: html_document
 ---
 
 
+```{r}
+library(tidyverse)
+judge_url <- "https://biostat2.uni.lu/practicals/data/judgments.tsv"
+judgments <- readr::read_tsv(judge_url)
+judgments <- readr::read_tsv("data/judgments.tsv", show_col_types = FALSE)
+judgments <- readr::read_delim("data/judgments.tsv")
+judgments
+```
+
 ### Identify the duplicated row
 Identify the duplicated subject.
+
+```{r}
+duped <- judgments$subject |> 
+  duplicated() |> 
+  which()
+duped
+```
 
 ### Compute basic statistics for all moral dilemma columns. 
 Compute the mean, the median, the standard deviation as well as min and max values.
@@ -17,7 +33,16 @@ Find meaningful short names for the functions such as `med` for  the median.
 Assign `judgments_condition_stats` to the results.
 
 ```{r}
-# Write your answer here
+judgments_condition_stats <- judgments |> 
+  summarize(across(starts_with("moral_dilemma"),
+                   list(
+                     "mean" = mean,
+                     "med" = median,
+                     "sd" = sd,
+                     "min" = min,
+                     "max" = max
+                   )))
+judgments_condition_stats
 ```
 
 
@@ -29,7 +54,11 @@ Find the number of subjects by `age`, `gender` and `condition`, e.g. how many 20
 Sort the resulting tibble such that the condition that contains the most populous group is sorted first (i.e. `stress` or `control` appear together). 
 
 ```{r}
-# Write your answer here
+judgments |>
+  group_by(condition, gender, age) |>
+  summarise(amount = n()) |> 
+  arrange(desc(amount), .by_group=TRUE) |> 
+  ungroup()
 ```
 
 Ensure that the resulting tibble does not contain groups.
